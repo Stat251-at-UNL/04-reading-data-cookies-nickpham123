@@ -2,7 +2,7 @@
 title: "Chocolate Chip Cookies"
 execute:
   error: true
-author: "Your Name"
+author: Nick Pham
 output: html_document
 ---
 
@@ -12,11 +12,34 @@ First, read in the CSV data of cookie ingredients.
 Make sure that your end-result data has appropriate types for each column - these should match the types provided in the documentation in the README.md file.
 
 ```{r}
+library(tidyverse)
 
+cookies <- read_csv("choc_chip_cookie_ingredients.csv",
+                     col_types = cols(
+                       Ingredient = col_character(),
+                       Text = col_character(),
+                       Recipe_Index = col_character(),
+                       Rating = col_double(),
+                       Quantity = col_double(),
+                       Unit = col_character(),            
+                     ))
+
+cookies <- select(cookies, -1)
 ```
 
 ```{python}
+import pandas as pd
 
+cookies = pd.read_csv("choc_chip_cookie_ingredients.csv",
+                      index_col=0,
+                      dtype={
+                          "Ingredient": str,
+                          "Text": str,
+                          "Recipe_Index": str,
+                          "Rating": float,
+                          "Quantity": float,
+                          "Unit": str
+                      })
 ```
 
 
@@ -34,11 +57,11 @@ Exploratory data analysis is the process of getting familiar with your dataset. 
 
 Generate at least 5 questions you might explore using this database of cookie ingredients.
 
-1.
-2. 
-3. 
-4. 
-5. 
+1. Which ingredients are most common across all cookie recipes?
+2. What's the relationship between recipe rating and the number of ingredients used?
+3. How much variations is there in flour quantities across recipes?
+4. Which recipes have the highest rating, and what ingredients do they have in common?
+5. What are the most common measurement units, and do certain ingredients use the same units?
 
 
 ### Skimming the Data
@@ -53,14 +76,19 @@ Install both packages, and read the package documentation ([R](https://cran.r-pr
 
 
 ```{r}
-
+library(skimr)
+skim(select(cookies, Rating, Quantity, Ingredient))
 ```
 
 ```{python}
-
+from skimpy import skim
+skim(cookies[["Rating", "Quantity", "Ingredient"]])
 ```
 
 [Part 2] Write 1-2 sentences about what you can tell from each summary display you generate. Did you discover anything new about the data?
+For skimr, about half the ratings are missing, which is a big gap in the data. There are 68 unique ingredients, and the Quantity column goes all the way up to 48 cups for some ingredients, which seems like a lot but makes sense since different ingredients need different amounts.
+The skimpy output confirms the same missing data pattern in the ratings just like the skimr output. Ingredent column shows the shortest ingredient name is butter and longest is vanilla.
+
 
 ### Generating Tables
 
@@ -71,13 +99,78 @@ You may want to use the `dplyr` package in R (`group_by` or `count` functions), 
 
 [Part 2] Print out a character string that lists all of the ingredients that do not appear in at least 20 recipes.
 
+```{r}
+total_recipes <- n_distinct(cookies$Recipe_Index)
 
-(Delete this note, but you can include data values inline in markdown text by using backticks, at least in R. For instance, here is R's built in value for pi: `r pi`. Unfortunately, this doesn't work in python using the knitr markdown engine, but you can print the list out in python anyways using a code chunk.)
+#Part 1
+ingredients_counts <- summarise(group_by(cookies, Ingredient), 
+                                  recipe_count = n_distinct(Recipe_Index),
+                                  proportion = n_distinct(Recipe_Index)/total_recipes)
+
+ingredients_counts <- arrange(ingredients_counts, desc(proportion))
+min_count <- ingredients_counts$recipe_count[20]
+common_20 <- filter(ingredients_counts, recipe_count >= min_count)
+print(common_20, n = 22)
+
+#Part 2
+rare_ingredients <- filter(ingredients_counts, recipe_count < 20)
+print(paste(rare_ingredients$Ingredient, collapse = ", "))
+```
+
+```{python}
+total_recipes = cookies["Recipe_Index"].nunique()
+
+#Part 1
+ingredient_counts = cookies.groupby("Ingredient")["Recipe_Index"].nunique().reset_index()
+ingredient_counts.columns = ["Ingredient", "recipe_count"]
+ingredient_counts["proportion"] = ingredient_counts["recipe_count"]/total_recipes
+ingredient_counts = ingredient_counts.sort_values("proportion", ascending=False)
+min_count = ingredient_counts.iloc[19]["recipe_count"]
+common_20 = ingredient_counts[ingredient_counts["recipe_count"] >= min_count]
+print(common_20)
+
+#Part 2
+rare_ingredients = ingredient_counts[ingredient_counts["recipe_count"] < 20]
+print(", ".join(rare_ingredients["Ingredient"]))
+```
+
 
 ### Visualization
 
 Using whatever plotting system you are comfortable with in R or python, see if you can create a couple of useful exploratory data visualizations which address one of the questions you wrote above - or another question which you've come up with as you've worked on this assignment.
 
 [Part 1] Create at least one plot (it doesn't have to be pretty) that showcases an interesting facet of the data.
+```{python}
+import matplotlib.pyplot as plt
 
+cups = cookies[cookies["Unit"] == "cup"]
+
+#Scatter plot of quantity (cups) vs rating
+plt.scatter(cups["Quantity"], cups["Rating"])
+plt.xlabel("Quantity (cups)")
+plt.ylabel("Rating")
+plt.title("Quantity (cups) vs Rating")
+plt.show()
+```
+
+```{python}
+tsp = cookies[cookies["Unit"] == "teaspoon"]
+
+#Histogram of quantity distribution for cups and teaspoons
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+ax1.hist(cups["Quantity"])
+ax1.set_xlabel("Quantity (cups)")
+ax1.set_ylabel("Frequency")
+ax1.set_title("Distribution of Quantity (cups)")
+
+ax2.hist(tsp["Quantity"])
+ax2.set_xlabel("Quantity (teaspoons)")
+ax2.set_ylabel("Frequency")
+ax2.set_title("Distribution of Quantity (teaspoons)")
+
+plt.tight_layout()
+plt.show()
+```
 [Part 2] Write 2-3 sentences about what you can learn from that plot and what directions you might want to investigate from here.
+The scatter plot of cup-measured ingredients vs rating shows no pattern, recipes with high and low ratings seem to use pretty similar amounts of ingredients, so quantity alone doesn't seem to predict how well a recipe does. The histograms show that both cups and teaspoons are heavily skewed to the right, meaning most ingredients are used in pretty small amounts with just a handful of outliers pushing way higher. 
