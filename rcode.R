@@ -25,6 +25,7 @@ ingredients_counts <- summarise(group_by(cookies, Ingredient),
 ingredients_counts <- arrange(ingredients_counts, desc(proportion))
 common_20 <- head(ingredients_counts, 20)
 print(common_20)
+filter(ingredients_counts, recipe_count == 9)
 
 #part2
 rare_ingredients <- filter(ingredients_counts, recipe_count < 20)

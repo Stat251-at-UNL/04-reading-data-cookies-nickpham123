@@ -108,8 +108,9 @@ ingredients_counts <- summarise(group_by(cookies, Ingredient),
                                   proportion = n_distinct(Recipe_Index)/total_recipes)
 
 ingredients_counts <- arrange(ingredients_counts, desc(proportion))
-common_20 <- head(ingredients_counts, 20)
-print(common_20)
+min_count <- ingredients_counts$recipe_count[20]
+common_20 <- filter(ingredients_counts, recipe_count >= min_count)
+print(common_20, n = 22)
 
 #Part 2
 rare_ingredients <- filter(ingredients_counts, recipe_count < 20)
@@ -124,7 +125,8 @@ ingredient_counts = cookies.groupby("Ingredient")["Recipe_Index"].nunique().rese
 ingredient_counts.columns = ["Ingredient", "recipe_count"]
 ingredient_counts["proportion"] = ingredient_counts["recipe_count"]/total_recipes
 ingredient_counts = ingredient_counts.sort_values("proportion", ascending=False)
-common_20 = ingredient_counts.head(20)
+min_count = ingredient_counts.iloc[19]["recipe_count"]
+common_20 = ingredient_counts[ingredient_counts["recipe_count"] >= min_count]
 print(common_20)
 
 #Part 2
@@ -141,21 +143,34 @@ Using whatever plotting system you are comfortable with in R or python, see if y
 ```{python}
 import matplotlib.pyplot as plt
 
-#Scatter plot of quantity vs rating
-plt.scatter(cookies["Quantity"], cookies["Rating"])
-plt.xlabel("Quantity")
+cups = cookies[cookies["Unit"] == "cup"]
+
+#Scatter plot of quantity (cups) vs rating
+plt.scatter(cups["Quantity"], cups["Rating"])
+plt.xlabel("Quantity (cups)")
 plt.ylabel("Rating")
-plt.title("Quantity vs Rating")
+plt.title("Quantity (cups) vs Rating")
 plt.show()
 ```
 
 ```{python}
-#Histogram of quantity distribution
-plt.hist(cookies["Quantity"])
-plt.xlabel("Quantity")
-plt.ylabel("Frequency")
-plt.title("Distribution of Quantity")
+tsp = cookies[cookies["Unit"] == "teaspoon"]
+
+#Histogram of quantity distribution for cups and teaspoons
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
+ax1.hist(cups["Quantity"])
+ax1.set_xlabel("Quantity (cups)")
+ax1.set_ylabel("Frequency")
+ax1.set_title("Distribution of Quantity (cups)")
+
+ax2.hist(tsp["Quantity"])
+ax2.set_xlabel("Quantity (teaspoons)")
+ax2.set_ylabel("Frequency")
+ax2.set_title("Distribution of Quantity (teaspoons)")
+
+plt.tight_layout()
 plt.show()
 ```
 [Part 2] Write 2-3 sentences about what you can learn from that plot and what directions you might want to investigate from here.
-The scatter plot shows that most ingredients are used in pretty small quantities (under 5 cups), and ratings are spread all over the place regardless of quantity, so there doesn't seem to be much of a relationship between the two. The histogram backs this up, showing that the vast majority of quantities are clustered near zero with a few extreme outliers pushing up to 48 cups. It would be interesting to dig deeper into those outliers and see if specific ingredients at certain quantities tend to show up in higher-rated recipes
+The scatter plot of cup-measured ingredients vs rating shows no pattern, recipes with high and low ratings seem to use pretty similar amounts of ingredients, so quantity alone doesn't seem to predict how well a recipe does. The histograms show that both cups and teaspoons are heavily skewed to the right, meaning most ingredients are used in pretty small amounts with just a handful of outliers pushing way higher. 

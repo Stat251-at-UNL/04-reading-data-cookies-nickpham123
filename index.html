@@ -381,10 +381,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">proportion =</span> <span class="fu">n_distinct</span>(Recipe_Index)<span class="sc">/</span>total_recipes)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>ingredients_counts <span class="ot">&lt;-</span> <span class="fu">arrange</span>(ingredients_counts, <span class="fu">desc</span>(proportion))</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>common_20 <span class="ot">&lt;-</span> <span class="fu">head</span>(ingredients_counts, <span class="dv">20</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(common_20)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>min_count <span class="ot">&lt;-</span> ingredients_counts<span class="sc">$</span>recipe_count[<span class="dv">20</span>]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>common_20 <span class="ot">&lt;-</span> <span class="fu">filter</span>(ingredients_counts, recipe_count <span class="sc">&gt;=</span> min_count)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(common_20, <span class="at">n =</span> <span class="dv">22</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 20 × 3
+<pre><code># A tibble: 22 × 3
    Ingredient                 recipe_count proportion
    &lt;chr&gt;                             &lt;int&gt;      &lt;dbl&gt;
  1 egg                                 204     0.976 
@@ -406,7 +407,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 17 milk                                 15     0.0718
 18 margarine                            11     0.0526
 19 pecan                                11     0.0526
-20 dark chocolate chip                   9     0.0431</code></pre>
+20 dark chocolate chip                   9     0.0431
+21 nuts                                  9     0.0431
+22 white chocolate chip                  9     0.0431</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Part 2</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>rare_ingredients <span class="ot">&lt;-</span> <span class="fu">filter</span>(ingredients_counts, recipe_count <span class="sc">&lt;</span> <span class="dv">20</span>)</span>
@@ -423,8 +426,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>ingredient_counts.columns <span class="op">=</span> [<span class="st">"Ingredient"</span>, <span class="st">"recipe_count"</span>]</span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>ingredient_counts[<span class="st">"proportion"</span>] <span class="op">=</span> ingredient_counts[<span class="st">"recipe_count"</span>]<span class="op">/</span>total_recipes</span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>ingredient_counts <span class="op">=</span> ingredient_counts.sort_values(<span class="st">"proportion"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>common_20 <span class="op">=</span> ingredient_counts.head(<span class="dv">20</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(common_20)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>min_count <span class="op">=</span> ingredient_counts.iloc[<span class="dv">19</span>][<span class="st">"recipe_count"</span>]</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>common_20 <span class="op">=</span> ingredient_counts[ingredient_counts[<span class="st">"recipe_count"</span>] <span class="op">&gt;=</span> min_count]</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(common_20)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                    Ingredient  recipe_count  proportion
 25                         egg           204    0.976077
@@ -446,7 +450,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 38                        milk            15    0.071770
 36                   margarine            11    0.052632
 47                       pecan            11    0.052632
-43                        nuts             9    0.043062</code></pre>
+43                        nuts             9    0.043062
+24         dark chocolate chip             9    0.043062
+64        white chocolate chip             9    0.043062</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Part 2</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>rare_ingredients <span class="op">=</span> ingredient_counts[ingredient_counts[<span class="st">"recipe_count"</span>] <span class="op">&lt;</span> <span class="dv">20</span>]</span>
@@ -463,12 +469,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Scatter plot of quantity vs rating</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(cookies[<span class="st">"Quantity"</span>], cookies[<span class="st">"Rating"</span>])</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Quantity"</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Rating"</span>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Quantity vs Rating"</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>cups <span class="op">=</span> cookies[cookies[<span class="st">"Unit"</span>] <span class="op">==</span> <span class="st">"cup"</span>]</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Scatter plot of quantity (cups) vs rating</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plt.scatter(cups[<span class="st">"Quantity"</span>], cups[<span class="st">"Rating"</span>])</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Quantity (cups)"</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Rating"</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Quantity (cups) vs Rating"</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -478,21 +486,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Histogram of quantity distribution</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>plt.hist(cookies[<span class="st">"Quantity"</span>])</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Quantity"</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Frequency"</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribution of Quantity"</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tsp <span class="op">=</span> cookies[cookies[<span class="st">"Unit"</span>] <span class="op">==</span> <span class="st">"teaspoon"</span>]</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Histogram of quantity distribution for cups and teaspoons</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>ax1.hist(cups[<span class="st">"Quantity"</span>])</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>ax1.set_xlabel(<span class="st">"Quantity (cups)"</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">"Frequency"</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Distribution of Quantity (cups)"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>ax2.hist(tsp[<span class="st">"Quantity"</span>])</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>ax2.set_xlabel(<span class="st">"Quantity (teaspoons)"</span>)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">"Frequency"</span>)</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Distribution of Quantity (teaspoons)"</span>)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-8-3.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-8-3.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>[Part 2] Write 2-3 sentences about what you can learn from that plot and what directions you might want to investigate from here. The scatter plot shows that most ingredients are used in pretty small quantities (under 5 cups), and ratings are spread all over the place regardless of quantity, so there doesn’t seem to be much of a relationship between the two. The histogram backs this up, showing that the vast majority of quantities are clustered near zero with a few extreme outliers pushing up to 48 cups. It would be interesting to dig deeper into those outliers and see if specific ingredients at certain quantities tend to show up in higher-rated recipes</p>
+<p>[Part 2] Write 2-3 sentences about what you can learn from that plot and what directions you might want to investigate from here. The scatter plot of cup-measured ingredients vs rating shows no pattern, recipes with high and low ratings seem to use pretty similar amounts of ingredients, so quantity alone doesn’t seem to predict how well a recipe does. The side-by-side histograms show that both cups and teaspoons are heavily skewed to the right, meaning most ingredients are used in pretty small amounts with just a handful of outliers pushing way higher. It would be cool to dig into whether those outlier quantities belong to specific ingredients, and whether certain ingredients at specific amounts tend to show up in the highest-rated recipes</p>
 </section>
 </section>
 
